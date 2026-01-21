@@ -6,6 +6,7 @@ out/
 dist/
 *.tgz
 build/
+*.wasm
 
 # code coverage
 coverage

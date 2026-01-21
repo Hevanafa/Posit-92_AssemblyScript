@@ -1,16 +1,16 @@
 {
   "targets": {
     "debug": {
-      "outFile": "build/debug.wasm",
+      "outFile": "game_debug.wasm",
       "textFile": null,
-      "sourceMap": true,
+      "sourceMap": false,
       "debug": true
     },
     "release": {
-      "outFile": "build/release.wasm",
+      "outFile": "game_release.wasm",
       "textFile": null,
 
-      "sourceMap": true,
+      "sourceMap": false,
       "optimizeLevel": 3,
       "shrinkLevel": 0,
       "converge": false,
@@ -22,7 +22,7 @@
     "memoryBase": 387072,
     "initialMemory": 32,
     "maximumMemory": 32,
-    "bindings": "esm"
+    "bindings": null
   },
   "include": [
     "../../experimental/units/*.ts",
