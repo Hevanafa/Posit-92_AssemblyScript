@@ -1,5 +1,6 @@
 import { cls, vgaFlush, vgaWidth } from "../../experimental/units/vga";
 import { double, LongInt } from "../../experimental/units/pascal_compat";
+import { fitCanvas } from "../../experimental/units/fullscreen";
 import { isKeyDown } from "../../experimental/units/keyboard";
 
 enum TGameStates {
