@@ -1,5 +1,18 @@
-// The entry file of your WebAssembly module.
+function init() {
 
-export function add(a: i32, b: i32): i32 {
-  return a + b;
 }
+
+function afterInit() {
+
+}
+
+function update() {}
+
+function draw() {
+  cls(0xFF6495ED);
+  vgaFlush()
+}
+
+export {
+  init, afterInit, update, draw
+};
