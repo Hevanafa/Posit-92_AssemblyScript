@@ -1,4 +1,4 @@
-import { cls, vgaFlush } from "../../../experimental/units/vga";
+import { cls, vgaFlush } from "../../experimental/units/vga";
 
 /**
  * Compatibility with Pascal
@@ -21,7 +21,7 @@ function draw(): void {
 }
 
 // Everything exported here will be available via WebAssembly instance exports
-export { initVideoMem, getSurfacePtr } from "../../../experimental/units/vga";
+export { initVideoMem, getSurfacePtr } from "../../experimental/units/vga";
 
 export {
   initHeap,
