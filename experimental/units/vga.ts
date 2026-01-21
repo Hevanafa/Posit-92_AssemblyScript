@@ -1,6 +1,6 @@
 import { Byte, LongWord, PByteArray, pointer, SmallInt, Word } from "./pascal_compat";
 
-let
+export let
   vgaWidth: Word = 0,
   vgaHeight: Word = 0,
   bufferSize: LongWord = 0,

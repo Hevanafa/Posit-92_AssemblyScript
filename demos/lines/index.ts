@@ -1,5 +1,5 @@
-import { cls, vgaFlush } from "../../experimental/units/vga";
-import { double } from "../../experimental/units/pascal_compat";
+import { cls, vgaFlush, vgaWidth } from "../../experimental/units/vga";
+import { double, LongInt } from "../../experimental/units/pascal_compat";
 import { isKeyDown } from "../../experimental/units/keyboard";
 
 enum TGameStates {
@@ -18,12 +18,16 @@ let
   actualGameState: TGameStates,
   gameTime: double;
 
-// @ts-nocheck
-@external("env", "signalDone") export declare function signalDone(): void;
-// @ts-check
+// @ts-ignore
+@external("env", "signalDone")
+export declare function signalDone(): void;
+@external("env", "hideCursor")
+export declare function hideCursor(): void;
+@external("env", "loadAssets")
+export declare function loadAssets(): void;
 
 function beginLoadingState(): void {
-  actualGameState = GameStateLoading;
+  actualGameState = TGameStates.GameStateLoading;
   fitCanvas();
   loadAssets()
 }
@@ -33,7 +37,7 @@ function beginPlayingState(): void {
   fitCanvas();
 
   // Initialise game state here
-  actualGameState = GameStatePlaying;
+  actualGameState = TGameStates.GameStatePlaying;
   gameTime = 0.0;
 }
 
@@ -72,14 +76,24 @@ function draw(): void {
   let w: SmallInt;
   let s: string;
 
-  if (actualGameState == GameStateLoading) {
+  if (actualGameState == TGameStates.GameStateLoading) {
     renderLoadingScreen();
     return
   }
 
   cls(CornflowerBlue);
 
-  // TODO: Add the rest of the boilerplate
+  if ((<LongInt>(gameTime * 4) & 1) > 0)
+    spr(imgDosuEXE[1], 148, 88)
+  else
+    spr(imgDosuEXE[0], 148, 88);
+
+  s = 'Hello world!';
+  w = measureDefault(s);
+  printDefault(s, (vgaWidth - w) / 2, 120);
+
+  drawMouse;
+  drawFPS;
 
   vgaFlush()
 }
