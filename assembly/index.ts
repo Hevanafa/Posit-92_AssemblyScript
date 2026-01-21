@@ -1,14 +1,16 @@
-function init() {
+import { cls } from "./units/vga";
+
+function init(): void {
 
 }
 
-function afterInit() {
+function afterInit(): void {
 
 }
 
-function update() {}
+function update(): void {}
 
-function draw() {
+function draw(): void {
   cls(0xFF6495ED);
   vgaFlush()
 }

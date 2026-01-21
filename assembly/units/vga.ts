@@ -15,3 +15,19 @@ export function initVideoMem(width: i16, height: i16, startAddr: usize) {
 export function getSurfacePtr(): usize {
   return surface;
 }
+
+function unsafePset(x: i16, y: i16, colour: u32): void {
+  const offset: u32 = (y * vgaWidth + x) * 4;
+
+  // ARGB to RGBA
+  surface[offset] = colour >> 16 & 0xFF;
+  surface[offset + 1] = colour >> 8 & 0xFF;
+  surface[offset + 2] = colour & 0xFF;
+  surface[offset + 3] = colour >> 24 & 0xFF;
+}
+
+export function cls(colour: u32) {
+  for (let b = 0; b < vgaHeight; b++)
+    for (let a = 0; a < vgaHeight; a++)
+      unsafePset(a, b, colour);
+}
