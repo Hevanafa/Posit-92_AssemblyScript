@@ -1,0 +1,31 @@
+{
+  "targets": {
+    "debug": {
+      "outFile": "game.wasm",
+      "textFile": null,
+      "sourceMap": false,
+      "debug": true
+    },
+    "release": {
+      "outFile": "game.wasm",
+      "textFile": null,
+
+      "sourceMap": false,
+      "optimizeLevel": 3,
+      "shrinkLevel": 0,
+      "converge": false,
+      "noAssert": false
+    }
+  },
+  "options": {
+    "stackSize": 131072,
+    "memoryBase": 387072,
+    "initialMemory": 32,
+    "maximumMemory": 32,
+    "bindings": null
+  },
+  "include": [
+    "../../experimental/units/*.ts",
+    "./index.ts"
+  ]
+}
