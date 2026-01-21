@@ -4,7 +4,12 @@ let
   bufferSize: i32 = 0,
   surface: usize = 0;
 
-export function initVideoMem(width: i16, height: i16, startAddr: usize) {
+//@ts-ignore
+@external("env", "vgaFlush")
+export declare function vgaFlush(): void;
+//@ts-check
+
+export function initVideoMem(width: i16, height: i16, startAddr: usize): void {
   vgaWidth = width;
   vgaHeight = height;
   surface = startAddr;
@@ -20,14 +25,14 @@ function unsafePset(x: i16, y: i16, colour: u32): void {
   const offset: u32 = (y * vgaWidth + x) * 4;
 
   // ARGB to RGBA
-  surface[offset] = colour >> 16 & 0xFF;
-  surface[offset + 1] = colour >> 8 & 0xFF;
-  surface[offset + 2] = colour & 0xFF;
-  surface[offset + 3] = colour >> 24 & 0xFF;
+  store<u8>(surface + offset, u8(colour >> 16 & 0xFF));
+  store<u8>(surface + offset + 1, u8(colour >> 8 & 0xFF));
+  store<u8>(surface + offset + 2, u8(colour & 0xFF));
+  store<u8>(surface + offset + 3, u8(colour >> 24 & 0xFF));
 }
 
-export function cls(colour: u32) {
-  for (let b = 0; b < vgaHeight; b++)
-    for (let a = 0; a < vgaHeight; a++)
+export function cls(colour: u32): void {
+  for (let b: i16 = 0; b < vgaHeight; b++)
+    for (let a: i16 = 0; a < vgaHeight; a++)
       unsafePset(a, b, colour);
 }

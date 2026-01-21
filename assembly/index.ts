@@ -1,4 +1,4 @@
-import { cls } from "./units/vga";
+import { cls, vgaFlush } from "./units/vga";
 
 function init(): void {
 
