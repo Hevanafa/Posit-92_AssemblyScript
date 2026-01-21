@@ -1,5 +1,6 @@
 import { cls, vgaFlush } from "../../experimental/units/vga";
 import { double } from "../../experimental/units/pascal_compat";
+import { isKeyDown } from "../../experimental/units/keyboard";
 
 enum TGameStates {
   GameStateIntro = 1,
