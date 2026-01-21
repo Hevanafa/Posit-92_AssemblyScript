@@ -1,7 +1,8 @@
 import { cls, vgaFlush, vgaWidth } from "../../experimental/units/vga";
-import { double, LongInt } from "../../experimental/units/pascal_compat";
+import { double, LongInt, SmallInt } from "../../experimental/units/pascal_compat";
 import { fitCanvas } from "../../experimental/units/fullscreen";
 import { isKeyDown } from "../../experimental/units/keyboard";
+import { dt, initDeltaTime } from "../../experimental/units/timing";
 
 enum TGameStates {
   GameStateIntro = 1,
@@ -22,8 +23,10 @@ let
 // @ts-ignore
 @external("env", "signalDone")
 export declare function signalDone(): void;
+// @ts-ignore
 @external("env", "hideCursor")
 export declare function hideCursor(): void;
+// @ts-ignore
 @external("env", "loadAssets")
 export declare function loadAssets(): void;
 
@@ -60,7 +63,7 @@ function update(): void {
   // Handle inputs
   updateMouse();
 
-  if (lastEsc <> isKeyDown(SC_ESC)) {
+  if (lastEsc != isKeyDown(SC_ESC)) {
     lastEsc = isKeyDown(SC_ESC);
 
     if (lastEsc) {
