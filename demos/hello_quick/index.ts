@@ -1,5 +1,5 @@
 import { cls, vgaFlush, vgaWidth } from "../../experimental/units/vga";
-import { double, LongInt, SmallInt } from "../../experimental/units/pascal_compat";
+import { Byte, double, LongInt, SmallInt } from "../../experimental/units/pascal_compat";
 import { fitCanvas } from "../../experimental/units/fullscreen";
 import { isKeyDown } from "../../experimental/units/keyboard";
 import { updateMouse } from "../../experimental/units/mouse";
@@ -13,7 +13,7 @@ enum TGameStates {
 }
 
 const
-  SC_ESC = 0x01,
+  SC_ESC: Byte = 0x01,
   CornflowerBlue = 0xFF6495ED;
 
 // Game state variables

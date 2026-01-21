@@ -12,13 +12,13 @@ export declare function getTimer(): double;
 @external("env", "getFullTimer")
 export declare function getFullTimer(): double;
 
-export function initDeltaTime() {
+export function initDeltaTime(): void {
   dt = 0.0;
   lastFrameTime = getTimer();
   currentTime = lastFrameTime
 }
 
-export function updateDeltaTime() {
+export function updateDeltaTime(): void {
   currentTime = getTimer();
   dt = currentTime - lastFrameTime;
   lastFrameTime = currentTime

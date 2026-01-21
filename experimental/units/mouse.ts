@@ -29,7 +29,7 @@ export declare function getMouseY(): SmallInt;
 @external("env", "getMouseButton")
 export declare function getMouseButton(): SmallInt;
 
-export function updateMouse() {
+export function updateMouse(): void {
   mouseX = getMouseX();
   mouseY = getMouseY();
   mouseButton = getMouseButton();
