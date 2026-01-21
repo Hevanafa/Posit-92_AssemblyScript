@@ -29,6 +29,9 @@ export declare function signalDone(): void;
 @external("env", "hideCursor")
 export declare function hideCursor(): void;
 // @ts-ignore
+@external("env", "hideLoadingOverlay")
+export declare function hideLoadingOverlay(): void;
+// @ts-ignore
 @external("env", "loadAssets")
 export declare function loadAssets(): void;
 
