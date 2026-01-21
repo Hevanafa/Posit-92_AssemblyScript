@@ -2,7 +2,8 @@ import { cls, vgaFlush, vgaWidth } from "../../experimental/units/vga";
 import { double, LongInt, SmallInt } from "../../experimental/units/pascal_compat";
 import { fitCanvas } from "../../experimental/units/fullscreen";
 import { isKeyDown } from "../../experimental/units/keyboard";
-import { dt, initDeltaTime } from "../../experimental/units/timing";
+import { incrementFPS, initFPSCounter } from "../../experimental/units/fps";
+import { dt, initDeltaTime, updateDeltaTime } from "../../experimental/units/timing";
 
 enum TGameStates {
   GameStateIntro = 1,
@@ -96,8 +97,8 @@ function draw(): void {
   w = measureDefault(s);
   printDefault(s, (vgaWidth - w) / 2, 120);
 
-  drawMouse;
-  drawFPS;
+  drawMouse();
+  drawFPS();
 
   vgaFlush()
 }
