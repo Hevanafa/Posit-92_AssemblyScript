@@ -19,8 +19,8 @@
   "scripts": {
     "compile": "npm run asbuild:debug",
 
-    "asbuild:debug": "asc assembly/index.ts --stackSize 131072 --initialMemory 32 --maximumMemory 32 --target debug",
-    "asbuild:release": "asc assembly/index.ts --stackSize 131072 --initialMemory 32 --maximumMemory 32 --target release",
+    "asbuild:debug": "asc assembly/index.ts --stackSize 131072 --memoryBase 387072 --initialMemory 32 --maximumMemory 32 --target debug",
+    "asbuild:release": "asc assembly/index.ts --stackSize 131072 --memoryBase 387072 --initialMemory 32 --maximumMemory 32 --target release",
     "asbuild": "npm run asbuild:debug && npm run asbuild:release",
     
     "test": "node tests",
