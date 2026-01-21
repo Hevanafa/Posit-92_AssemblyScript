@@ -1,4 +1,3 @@
-/// <reference path="./posit-92.d.ts" />
 // Copied from experimental/posit-92.js
 // Last synced: 2026-01-20
 
@@ -8,7 +7,7 @@
 class Posit92 {
   static version = "0.1.4_experimental";
 
-  #wasmSource = "game.wasm";
+  #wasmSource = "build/debug.wasm";
 
   #vgaWidth = 320;
   #vgaHeight = 200;
