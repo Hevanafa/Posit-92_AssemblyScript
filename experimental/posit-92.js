@@ -1,8 +1,9 @@
-// Copied from experimental/posit-92.js
+// Copied from the main Posit-92 Wasm
 // Last synced: 2026-01-20
 
 "use strict";
 
+// @ts-check
 class Posit92 {
   static version = "0.1.4_experimental";
 

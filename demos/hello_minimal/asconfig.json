@@ -1,13 +1,13 @@
 {
   "targets": {
     "debug": {
-      "outFile": "game_debug.wasm",
+      "outFile": "game.wasm",
       "textFile": null,
       "sourceMap": false,
       "debug": true
     },
     "release": {
-      "outFile": "game_release.wasm",
+      "outFile": "game.wasm",
       "textFile": null,
 
       "sourceMap": false,
