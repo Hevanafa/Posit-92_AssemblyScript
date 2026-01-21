@@ -1,10 +1,5 @@
 import { cls, vgaFlush } from "../../experimental/units/vga";
 
-/**
- * Compatibility with Pascal
- */
-function initHeap(heapStart: u32, heapSize: u32): void {}
-
 function init(): void {
 
 }
@@ -22,8 +17,8 @@ function draw(): void {
 
 // Everything exported here will be available via WebAssembly instance exports
 export { initVideoMem, getSurfacePtr } from "../../experimental/units/vga";
+export { initHeap } from "../../experimental/units/wasm_heap";
 
 export {
-  initHeap,
   init, afterInit, update, draw
 };
