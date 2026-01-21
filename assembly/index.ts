@@ -1,4 +1,9 @@
-import { cls, vgaFlush } from "./units/vga";
+import { initVideoMem, getSurfacePtr, cls, vgaFlush } from "./units/vga";
+
+/**
+ * Compatibility with Pascal
+ */
+function initHeap(heapStart: u32, heapSize: u32): void {}
 
 function init(): void {
 
@@ -16,5 +21,7 @@ function draw(): void {
 }
 
 export {
+  initHeap,
+  initVideoMem, getSurfacePtr,
   init, afterInit, update, draw
 };

@@ -22,7 +22,7 @@ export function getSurfacePtr(): usize {
 }
 
 function unsafePset(x: i16, y: i16, colour: u32): void {
-  const offset: u32 = (y * vgaWidth + x) * 4;
+  const offset: u32 = (u32(y) * vgaWidth + x) * 4;
 
   // ARGB to RGBA
   store<u8>(surface + offset, u8(colour >> 16 & 0xFF));
@@ -33,6 +33,6 @@ function unsafePset(x: i16, y: i16, colour: u32): void {
 
 export function cls(colour: u32): void {
   for (let b: i16 = 0; b < vgaHeight; b++)
-    for (let a: i16 = 0; a < vgaHeight; a++)
+    for (let a: i16 = 0; a < vgaWidth; a++)
       unsafePset(a, b, colour);
 }

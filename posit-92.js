@@ -145,6 +145,8 @@ class Posit92 {
     }
 
     const result = await WebAssembly.instantiate(bytes.buffer, this.#importObject);
+    console.log("exports", result.instance.exports);
+
     this.#wasm = result.instance;
   }
 
@@ -182,11 +184,13 @@ class Posit92 {
   }
 
   async init() {
+    console.log("init");
     this.#loadMidnightOffset();
 
     Object.freeze(this.#importObject);
     await this.#initWebAssembly();
     this.#initWasmMemory();
+
     this.#wasm.exports.init();
 
     this.#initKeyboard();
