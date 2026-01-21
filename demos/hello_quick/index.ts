@@ -2,6 +2,7 @@ import { cls, vgaFlush, vgaWidth } from "../../experimental/units/vga";
 import { double, LongInt, SmallInt } from "../../experimental/units/pascal_compat";
 import { fitCanvas } from "../../experimental/units/fullscreen";
 import { isKeyDown } from "../../experimental/units/keyboard";
+import { updateMouse } from "../../experimental/units/mouse";
 import { incrementFPS, initFPSCounter } from "../../experimental/units/fps";
 import { dt, initDeltaTime, updateDeltaTime } from "../../experimental/units/timing";
 
