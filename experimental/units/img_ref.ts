@@ -1,3 +1,4 @@
+import { writeLogI32 } from "./logger";
 import { Byte, LongInt, LongWord, PByte, SmallInt } from "./pascal_compat";
 
 class TImageRef {
@@ -49,6 +50,9 @@ export function registerImageRef(imgHandle: LongInt, dataPtr: PByte, w: SmallInt
   imageRefs[imgHandle].height = h;
   imageRefs[imgHandle].allocSize = <LongWord>w * h * 4;
   imageRefs[imgHandle].dataPtr = dataPtr;
+
+  for (let a: SmallInt = 0; a < 20; a++)
+    writeLogI32(load<Byte>(imageRefs[imgHandle].dataPtr + a));
 }
 
 export function getImagePtr(imgHandle: LongInt): PImageRef {
