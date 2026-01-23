@@ -23,7 +23,7 @@ export function getSurfacePtr(): pointer {
   return surface;
 }
 
-function unsafePset(x: SmallInt, y: SmallInt, colour: LongWord): void {
+export function unsafePset(x: SmallInt, y: SmallInt, colour: LongWord): void {
   const offset = (<LongWord>y * vgaWidth + x) * 4;
 
   // ARGB to RGBA
