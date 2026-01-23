@@ -1,14 +1,15 @@
-import { cls, vgaFlush, vgaWidth } from "../../experimental/units/vga";
 import { Byte, double, LongInt, SmallInt, Word } from "../../experimental/units/pascal_compat";
+
+import { i32str } from "../../experimental/units/conv";
+import { cls, vgaFlush, vgaWidth } from "../../experimental/units/vga";
 import { fitCanvas } from "../../experimental/units/fullscreen";
 import { isKeyDown } from "../../experimental/units/keyboard";
 import { getMouseX, getMouseY, updateMouse } from "../../experimental/units/mouse";
-import { incrementFPS, initFPSCounter } from "../../experimental/units/fps";
+import { getLastFPS, incrementFPS, initFPSCounter } from "../../experimental/units/fps";
 import { dt, initDeltaTime, updateDeltaTime } from "../../experimental/units/timing";
 import { spr, sprRegion } from "../../experimental/units/img_ref_fast";
 
 import { imgCGA, imgCursor, imgDosuEXE } from "./assets";
-import { writeLog, writeLogI32 } from "../../experimental/units/logger";
 
 enum TGameStates {
   GameStateIntro = 1,
@@ -40,9 +41,9 @@ export declare function hideLoadingOverlay(): void;
 export declare function loadAssets(): void;
 
 
-// function drawFPS(): void {
-//   printDefault('FPS:' + i32str(getLastFPS), 240, 0);
-// }
+function drawFPS(): void {
+  printSimple("FPS:" + i32str(getLastFPS()), 240, 0);
+}
 
 function drawMouse(): void {
   spr(imgCursor, getMouseX(), getMouseY())
@@ -60,7 +61,6 @@ function beginPlayingState(): void {
   fitCanvas();
 
   // Initialise game state here
-  writeLog("beginPlayingState");
   actualGameState = TGameStates.GameStatePlaying;
   gameTime = 0.0;
 }
@@ -132,7 +132,7 @@ function draw(): void {
   printSimple("Hello world!", (vgaWidth - 96) / 2, 120);
 
   drawMouse();
-  // drawFPS();
+  drawFPS();
 
   vgaFlush()
 }
