@@ -15,6 +15,9 @@ class Posit92 {
     #importObject = {
         env: {
             _haltproc: this.#handleHaltProc.bind(this),
+            abort: (message, filename, line, column) => {
+                throw new Error("env.abort: Function not implemented.");
+            },
             hideLoadingOverlay: this.hideLoadingOverlay.bind(this),
             loadAssets: this.#loadAssets.bind(this),
             getLoadingActual: this.getLoadingActual.bind(this),
@@ -27,8 +30,8 @@ class Posit92 {
             fitCanvas: () => this.#fitCanvas(),
             isKeyDown: this.#isKeyDown.bind(this),
             signalDone: this.#signalDone.bind(this),
-            writeLogF32: value => console.log("Pascal (f32):", value),
-            writeLogI32: value => console.log("Pascal (i32):", value),
+            writeLogF32: value => console.log("AssemblyScript (f32):", value),
+            writeLogI32: value => console.log("AssemblyScript (i32):", value),
             flushLog: () => this.#pascalWriteLog(),
             getMouseX: () => this.#getMouseX(),
             getMouseY: () => this.#getMouseY(),
@@ -495,12 +498,12 @@ class Posit92 {
             this.#mouseButton = 0;
     }
     #pascalWriteLog() {
-        const bufferPtr = this.#wasm.exports.getLogBuffer();
+        const bufferPtr = this.#wasm.exports.getLogBufferPtr();
         const buffer = new Uint8Array(this.#wasm.exports.memory.buffer, bufferPtr, 256);
         const len = buffer[0];
         const msgBytes = buffer.slice(1, 1 + len);
         const msg = new TextDecoder().decode(msgBytes);
-        console.log("Pascal:", msg);
+        console.log("AssemblyScript:", msg);
     }
     #panicHalt(textPtr, textLen) {
         const buffer = new Uint8Array(this.#wasm.exports.memory.buffer, textPtr, textLen);

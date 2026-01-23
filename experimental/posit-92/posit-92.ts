@@ -151,8 +151,8 @@ class Posit92 {
       signalDone: this.#signalDone.bind(this),
 
       // Logger
-      writeLogF32: value => console.log("Pascal (f32):", value),
-      writeLogI32: value => console.log("Pascal (i32):", value),
+      writeLogF32: value => console.log("AssemblyScript (f32):", value),
+      writeLogI32: value => console.log("AssemblyScript (i32):", value),
       flushLog: () => this.#pascalWriteLog(),
 
       // Mouse
@@ -831,7 +831,7 @@ class Posit92 {
     const msgBytes = buffer.slice(1, 1 + len);
     const msg = new TextDecoder().decode(msgBytes);
 
-    console.log("Pascal:", msg);
+    console.log("AssemblyScript:", msg);
   }
 
 
