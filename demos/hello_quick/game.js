@@ -7,12 +7,13 @@ class Game extends Posit92 {
   /**
    * KeyboardEvent.code to DOS scancode
    */
-  ScancodeMap = {};
+  ScancodeMap = {
+    "Escape": 0x01,
+  };
 
   AssetManifest = {
     images: {
-      cursor: "assets/images/cursor.png",
-      cga: "assets/images/CGA8x8.png"
+      cursor: "assets/images/cursor.png"
       // Add more image assets here
     },
     sounds: new Map([
@@ -21,10 +22,10 @@ class Game extends Posit92 {
   }
 
   async loadDefaultFont() {
-    // await this.loadBMFont(
-    //   "assets/fonts/nokia_cellphone_fc_8.txt",
-    //   this.wasmInstance.exports.defaultFontPtr(),
-    //   this.wasmInstance.exports.defaultFontGlyphsPtr());
+    await this.loadBMFont(
+      "assets/fonts/nokia_cellphone_fc_8.txt",
+      this.wasmInstance.exports.defaultFontPtr(),
+      this.wasmInstance.exports.defaultFontGlyphsPtr());
   }
 
   /**
