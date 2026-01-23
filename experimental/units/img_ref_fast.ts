@@ -54,14 +54,14 @@ export function sprRegion(
 
   for (b=0; b < srcH; b++)
   for (a=0; a < srcW; a++) {
-    if (((destX + a >= vgaWidth) || (destX + a < 0)
-      || (destY + b >= vgaHeight) || (destY + b < 0))) continue;
+    if (((destX + a >= <i16>vgaWidth) || (destX + a < 0)
+      || (destY + b >= <i16>vgaHeight) || (destY + b < 0))) continue;
 
     sx = srcX + a;
     sy = srcY + b;
     srcPos = (sx + sy * image.width) * 4;
 
-    alpha = load<Byte>(image.dataPtr, srcPos + 3);
+    alpha = load<Byte>(image.dataPtr + srcPos + 3);
     if (alpha < 255) continue;
 
     colour = unsafeSprPget(image, sx, sy);
