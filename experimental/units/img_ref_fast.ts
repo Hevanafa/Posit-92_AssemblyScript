@@ -25,7 +25,7 @@ export function spr(imgHandle: LongInt, x: SmallInt, y: SmallInt): void {
       || (y + py >= <i16>vgaHeight) || (y + py < 0)) continue;
 
     // offset to ImageData buffer
-    offset = (px + py * image.width) * 4;
+    offset = (<LongWord>px + py * image.width) * 4;
 
     a = load<Byte>(image.dataPtr + offset + 3);
     if (a < 255) continue;
@@ -44,7 +44,7 @@ export function sprRegion(
     image: TImageRef,
     a: SmallInt, b: SmallInt,
     sx: SmallInt, sy: SmallInt,
-    srcPos: LongInt,
+    srcPos: LongWord,
     alpha: Byte,
     colour: LongWord;
 
@@ -59,7 +59,7 @@ export function sprRegion(
 
     sx = srcX + a;
     sy = srcY + b;
-    srcPos = (sx + sy * image.width) * 4;
+    srcPos = (<LongWord>sx + sy * image.width) * 4;
 
     alpha = load<Byte>(image.dataPtr + srcPos + 3);
     if (alpha < 255) continue;

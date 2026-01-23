@@ -64,7 +64,7 @@ export function isImageSet(imgHandle: LongInt): boolean {
 // Assuming image isn't nil & the bounds are known
 export function unsafeSprPget(image: TImageRef, x: SmallInt, y: SmallInt): LongWord {
   let offset: LongWord;
-  offset = (x + y * image.width) * 4;
+  offset = (<LongWord>x + y * image.width) * 4;
 
   return (load<Byte>(image.dataPtr + offset + 3) << 24)
     | (load<Byte>(image.dataPtr + offset) << 16)
