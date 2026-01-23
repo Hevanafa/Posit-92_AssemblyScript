@@ -79,7 +79,7 @@ export function printBMFont(
   let ch: Byte;
   let left: SmallInt = 0;
 
-  for (a = 0; a < text.length; a++) {
+  for (a = 0; a < <Word>text.length; a++) {
     ch = <Byte>text[a].charCodeAt(0);
     left +=  printBMFontChar(font, fontGlyphs, ch, x + left, y)
   }
@@ -95,7 +95,7 @@ export function measureBMFont(glyphs: StaticArray<TBMFontGlyph>, text: string): 
   result = 0;
 
   // for a=1 to length(text) do begin
-  for (a=0; a < text.length; a++) {
+  for (a = 0; a < <Word>text.length; a++) {
     charcode = <Byte>text[a].charCodeAt(0);
 
     // { Assuming the starting charcode is always 32 }

@@ -29,7 +29,7 @@ export function defaultFontGlyphsPtr(): pointer {
   return changetype<pointer>(defaultFontGlyphs)
 }
 
-export function printDefault(text: string, x: SmallInt, y: SmallInt) {
+export function printDefault(text: string, x: SmallInt, y: SmallInt): void {
   printBMFont(defaultFont, defaultFontGlyphs, text, x, y)
 }
 
