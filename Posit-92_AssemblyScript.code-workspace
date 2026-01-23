@@ -29,6 +29,7 @@
 			}
 		},
 		"typescript.autoClosingTags": false,
-		"javascript.autoClosingTags": false
+		"javascript.autoClosingTags": false,
+		"html.autoClosingTags": false
 	}
 }
