@@ -30,7 +30,7 @@ const MaxImageRefs = 256;
 const imageRefs = new StaticArray<TImageRef>(MaxImageRefs + 1);
 
 function findEmptyImageRefSlot(): SmallInt {
-  let a: LongInt;
+  let a: SmallInt;
 
   for (a = 1; a <= MaxImageRefs; a++)
     if (!isImageSet(a))

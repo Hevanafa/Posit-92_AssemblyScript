@@ -34,6 +34,9 @@ class Posit92 {
     env: {
       _haltproc: this.#handleHaltProc.bind(this),
 
+      // AssemblyScript
+      abort: (message, fileName, line, column) => {},
+
       // Intro
       hideLoadingOverlay: this.hideLoadingOverlay.bind(this),
       loadAssets: this.#loadAssets.bind(this),

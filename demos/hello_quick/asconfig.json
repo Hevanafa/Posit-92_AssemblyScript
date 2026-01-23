@@ -22,7 +22,8 @@
     "memoryBase": 387072,
     "initialMemory": 32,
     "maximumMemory": 32,
-    "bindings": null
+    "bindings": null,
+    "exportRuntime": true
   },
   "include": [
     "../../experimental/units/*.ts",

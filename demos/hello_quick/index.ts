@@ -125,6 +125,7 @@ function draw(): void {
 
 export { initVideoMem, getSurfacePtr } from "../../experimental/units/vga";
 export { initHeap, WasmGetMem } from "../../experimental/units/wasm_heap";
+export { registerImageRef } from "../../experimental/units/img_ref";
 
 export {
   beginLoadingState,
