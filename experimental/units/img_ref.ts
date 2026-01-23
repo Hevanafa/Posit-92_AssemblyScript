@@ -1,4 +1,4 @@
-import { LongInt, LongWord, PByte, SmallInt } from "./pascal_compat";
+import { Byte, LongInt, LongWord, PByte, SmallInt } from "./pascal_compat";
 
 class TImageRef {
   width: SmallInt;
@@ -58,6 +58,17 @@ export function isImageSet(imgHandle: LongInt): bool {
   if (imgHandle <= 0) return false;
 
   return imageRefs[imgHandle].allocSize > 0
+}
+
+// Assuming image isn't nil & the bounds are known
+export function unsafeSprPget(image: PImageRef, x: SmallInt, y: SmallInt): LongWord {
+  let offset: LongWord;
+  offset = (x + y * image.width) * 4;
+
+  return (load<Byte>(image.dataPtr + offset + 3) << 24)
+    || (load<Byte>(image.dataPtr + offset) << 16)
+    || (load<Byte>(image.dataPtr + offset + 1) << 8)
+    || (load<Byte>(image.dataPtr + offset + 2))
 }
 
 
