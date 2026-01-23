@@ -1,7 +1,7 @@
 {
 	"folders": [
 		{
-			"path": "../.."
+			"path": "."
 		}
 	],
 	"settings": {
@@ -27,6 +27,8 @@
 				"source": "Git Bash",
 				"icon": "terminal-git-bash"
 			}
-		}
+		},
+		"typescript.autoClosingTags": false,
+		"javascript.autoClosingTags": false
 	}
 }
