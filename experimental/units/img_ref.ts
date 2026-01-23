@@ -60,6 +60,8 @@ export function freeImage(imgHandle: LongInt): void {
   imageRefs[imgHandle].width = 0;
   imageRefs[imgHandle].height = 0;
   imageRefs[imgHandle].allocSize = 0;
+  
+  __unpin(imageRefs[imgHandle].dataPtr);
   imageRefs[imgHandle].dataPtr = 0;
 }
 
