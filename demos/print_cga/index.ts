@@ -1,14 +1,14 @@
 import { cls, vgaFlush, vgaWidth } from "../../experimental/units/vga";
-import { Byte, double, LongInt, SmallInt } from "../../experimental/units/pascal_compat";
+import { Byte, double, LongInt, SmallInt, Word } from "../../experimental/units/pascal_compat";
 import { fitCanvas } from "../../experimental/units/fullscreen";
 import { isKeyDown } from "../../experimental/units/keyboard";
 import { getMouseX, getMouseY, updateMouse } from "../../experimental/units/mouse";
 import { incrementFPS, initFPSCounter } from "../../experimental/units/fps";
 import { dt, initDeltaTime, updateDeltaTime } from "../../experimental/units/timing";
-import { spr } from "../../experimental/units/img_ref_fast";
+import { spr, sprRegion } from "../../experimental/units/img_ref_fast";
 
-import { imgCursor, imgDosuEXE } from "./assets";
-import { writeLog } from "../../experimental/units/logger";
+import { imgCGA, imgCursor, imgDosuEXE } from "./assets";
+import { writeLog, writeLogI32 } from "../../experimental/units/logger";
 
 enum TGameStates {
   GameStateIntro = 1,
@@ -66,6 +66,39 @@ function beginPlayingState(): void {
 }
 
 
+let once = false;
+function printSimple(text: string, x: SmallInt, y: SmallInt): void {
+  let a: Word;
+  let charcode: Byte;
+  let left: SmallInt = 0;
+  let row: SmallInt, col: SmallInt;
+
+  if (!once) {
+    writeLog("Charcodes");
+    once = true;
+
+    for (a = 0; a < <u16>text.length; a++) {
+      charcode = <Byte>text.charCodeAt(a);
+      writeLogI32(charcode / 16);
+      writeLogI32(charcode % 16);
+    }
+  }
+
+  for (a = 0; a < <u16>text.length; a++) {
+    charcode = <Byte>text.charCodeAt(a);
+    row = charcode / 16;
+    col = charcode % 16;
+
+    sprRegion(
+      imgCGA,
+      col * 8, row * 8, 8, 8,
+      x + left, y);
+
+    left += 8
+  }
+}
+
+
 function init(): void {
   // initHeapMgr();
   initDeltaTime();
@@ -107,10 +140,17 @@ function draw(): void {
 
   cls(CornflowerBlue);
 
-  if ((<LongInt>(gameTime * 4) & 1) > 0)
-    spr(imgDosuEXE[1], 148, 88)
-  else
-    spr(imgDosuEXE[0], 148, 88);
+  // spr(imgCGA, 10, 10);
+  sprRegion(imgCGA, 64, 32, 8, 8, 10, 20);
+  sprRegion(imgCGA, 8 * 8, 4 * 8, 8, 8, 10, 30);
+  printSimple("Help!", 10, 10);
+
+  // if ((<LongInt>(gameTime * 4) & 1) > 0)
+  //   spr(imgDosuEXE[1], 148, 88)
+  // else
+  //   spr(imgDosuEXE[0], 148, 88);
+
+  // printSimple("Hello world!", 10, 10);
 
   // s = 'Hello world!';
   // w = measureDefault(s);
@@ -125,7 +165,7 @@ function draw(): void {
 // Everything exported here will be available
 // via WebAssembly instance exports
 
-export { setImgCursor, setImgDosuEXE } from "./assets";
+export { setImgCursor, setImgDosuEXE, setImgCga } from "./assets";
 
 export { initVideoMem, getSurfacePtr } from "../../experimental/units/vga";
 export { initHeap, WasmGetMem } from "../../experimental/units/wasm_heap";

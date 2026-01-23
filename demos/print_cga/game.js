@@ -11,7 +11,8 @@ class Game extends Posit92 {
 
   AssetManifest = {
     images: {
-      cursor: "assets/images/cursor.png"
+      cursor: "assets/images/cursor.png",
+      cga: "assets/images/CGA8x8.png"
       // Add more image assets here
     },
     sounds: new Map([
