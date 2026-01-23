@@ -5,6 +5,8 @@ import { isKeyDown } from "../../experimental/units/keyboard";
 import { getMouseX, getMouseY, updateMouse } from "../../experimental/units/mouse";
 import { incrementFPS, initFPSCounter } from "../../experimental/units/fps";
 import { dt, initDeltaTime, updateDeltaTime } from "../../experimental/units/timing";
+import { spr } from "../../experimental/units/img_ref_fast";
+
 import { imgCursor } from "./assets";
 
 enum TGameStates {

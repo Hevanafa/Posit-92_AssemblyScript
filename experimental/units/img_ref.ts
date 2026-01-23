@@ -42,7 +42,8 @@ function findEmptyImageRefSlot(): SmallInt {
 export function registerImageRef(imgHandle: LongInt, dataPtr: PByte, w: SmallInt, h: SmallInt): void {
   const idx = findEmptyImageRefSlot();
 
-  if (idx < 0) panicHalt("Image ref pool is full!");
+  // if (idx < 0) panicHalt("Image ref pool is full!");
+  if (idx < 0) return;
 
   imageRefs[imgHandle].width = w;
   imageRefs[imgHandle].height = h;
