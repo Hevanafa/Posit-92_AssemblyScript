@@ -6,8 +6,8 @@ export let
   imgCGA: LongInt,
   imgDosuEXE = new StaticArray<LongInt>(2),
   
-  defaultFont: TBMFont,
-  defaultFontGlyphs: StaticArray<TBMFontGlyph>;
+  defaultFont = new TBMFont(),
+  defaultFontGlyphs = new StaticArray<TBMFontGlyph>(127);
 
 export function setImgCursor(imgHandle: LongInt): void {
   imgCursor = imgHandle
@@ -28,7 +28,3 @@ export function defaultFontPtr(): pointer {
 export function defaultFontGlyphsPtr(): pointer {
   return changetype<pointer>(defaultFontGlyphs)
 }
-
-// Initialisation
-defaultFont = new TBMFont();
-defaultFontGlyphs = new StaticArray<TBMFontGlyph>(127);
