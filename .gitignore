@@ -34,3 +34,6 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 # Finder (MacOS) folder config
 .DS_Store
+experimental/posit-92/*.d.ts
+experimental/posit-92/*.js
+experimental/posit-92/*.js.map

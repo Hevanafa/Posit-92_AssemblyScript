@@ -1,37 +1,123 @@
-// Copied from the main Posit-92 Wasm
-// Last synced: 2026-01-20
-
 "use strict";
 
-// @ts-check
+type ImageManifest = Record<string, string | string[]>;
+type SoundManifest = Map<number, string>;
+type BMFontManifest = Map<string, { path: string, setter: string, glyphSetter: string }>;
+
+/**
+ * The type definitions here are copied from Pascal except for `memory`
+ */
+type WasmExports = {
+  memory: WebAssembly.Memory,
+
+  // LOGGER.PAS
+  getLogBuffer: () => number,
+
+  // VGA.PAS
+  getSurfacePtr: () => number,
+  initVideoMem: (width: number, height: number, startAddr: number) => void,
+  initHeap: (startAddr: number, heapSize: number) => void,
+  WasmGetMem: (bytes: number) => number,
+
+  // IMGREF.PAS
+  registerImageRef: (imgHandle: number, dataPtr: number, width: number, height: number) => void;
+
+  // Primary unit
+  beginIntroState: () => void,
+  beginLoadingState: () => void,
+  init: () => void,
+  afterInit: () => void,
+  update: () => void,
+  draw: () => void
+};
+
+type WasmImports = {
+  env: {
+    _haltproc: (n: number) => void,
+
+    hideLoadingOverlay: () => void,
+    loadAssets: () => void,
+
+    // Loading
+    getLoadingActual: () => number,
+    getLoadingTotal: () => number,
+
+    hideCursor: () => void,
+    showCursor: () => void,
+
+    // Fullscreen
+    toggleFullscreen: () => void,
+    endFullscreen: () => void,
+    getFullscreenState: () => boolean,
+    fitCanvas: () => void,
+
+    // Keyboard
+    isKeyDown: (scancode: number) => boolean,
+    signalDone: () => void,
+
+    // Logger
+    writeLogF32: (value: number) => void,
+    writeLogI32: (value: number) => void,
+    flushLog: () => void,
+
+    // Mouse
+    getMouseX: () => number,
+    getMouseY: () => number,
+    getMouseButton: () => number,
+
+    // Panic
+    jsPanicHalt: (textPtr: number, textLen: number) => void,
+
+    // Timing
+    getTimer: () => number,
+    getFullTimer: () => number,
+
+    // VGA
+    vgaFlush: () => void
+  }
+}
+
+type StringPair = [string, string];
+
+type WebAssemblyInstance = WebAssembly.Instance & { exports: WasmExports };
+
+type TBMFontGlyph = {
+  id: number,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  xoffset: number,
+  yoffset: number,
+  xadvance: number,
+  lineHeight: number
+}
+
 class Posit92 {
   static version = "0.1.4_experimental";
 
   #wasmSource = "game.wasm";
 
+  // Engine configs
+  #wasmMemSize = 2 * 1048576; // 2 MB
+  #stackSize = 128 * 1024;
+  #videoMemSize = 0;
+
   #vgaWidth = 320;
   #vgaHeight = 200;
 
-  #canvas;
-  #ctx;
+  #canvas: HTMLCanvasElement;
+  #ctx: CanvasRenderingContext2D;
 
-  #wasm;
+  #wasm: WebAssemblyInstance = null!;
   get wasmInstance() { return this.#wasm }
 
-  #wasmMemSize = 2 * 1048576; // 2 MB
-  #stackSize = 128 * 1024;
-  #videoMemSize = this.#vgaWidth * this.#vgaHeight * 4;
-
-
   /**
-   * Used in getTimer
+   * Used in `getTimer`
    */
   #midnightOffset = 0;
 
-  /**
-   * @type {WebAssembly.Imports}
-   */
-  #importObject = {
+  #importObject: WasmImports = {
     env: {
       _haltproc: this.#handleHaltProc.bind(this),
 
@@ -67,7 +153,7 @@ class Posit92 {
       getMouseButton: () => this.#getMouseButton(),
 
       // Panic
-      panicHalt: this.#panicHalt.bind(this),
+      jsPanicHalt: this.#panicHalt.bind(this),
 
       // Timing
       getTimer: () => this.#getTimer(),
@@ -82,28 +168,29 @@ class Posit92 {
     return this.#importObject
   }
   
-  #handleHaltProc(exitcode) {
+  #handleHaltProc(exitcode: number) {
     console.log("Programme halted with code:", exitcode);
     this.cleanup();
+    //@ts-ignore
     done = true
   }
 
   #signalDone() {
     this.cleanup();
+    //@ts-ignore
     done = true
   }
 
-  constructor(canvasID) {
-    if (canvasID == null)
-      throw new Error("canvasID is required!");
-
+  constructor(canvasID: string) {
     this.#assertString(canvasID);
 
-    this.#canvas = document.getElementById(canvasID);
-    if (this.#canvas == null)
+    if (document.getElementById(canvasID) == null)
       throw new Error(`Couldn't find canvasID \"${ canvasID }\"`);
 
-    this.#ctx = this.#canvas.getContext("2d");
+    this.#canvas = <HTMLCanvasElement>document.getElementById(canvasID);
+    this.#ctx = this.#canvas.getContext("2d")!;
+
+    this.#videoMemSize = this.#vgaWidth * this.#vgaHeight * 4
   }
 
   #loadMidnightOffset() {
@@ -122,6 +209,9 @@ class Posit92 {
     // in bytes:
     const total = Number(contentLength);
     let loaded = 0;
+
+    if (response.body == null)
+      throw new Error("Missing response.body");
 
     const reader = response.body.getReader();
     const chunks = [];
@@ -145,14 +235,14 @@ class Posit92 {
     }
 
     const result = await WebAssembly.instantiate(bytes.buffer, this.#importObject);
-    this.#wasm = result.instance;
+    this.#wasm = <WebAssemblyInstance>result.instance;
   }
 
   /**
-   * @param {number} loaded in bytes
-   * @param {number} total in bytes
+   * @param loaded in bytes
+   * @param total in bytes
    */
-  onWasmProgress(loaded, total) {
+  onWasmProgress(loaded: number, total: number) {
     const loadedKB = Math.ceil(loaded / 1024);
 
     if (isNaN(total))
@@ -187,7 +277,6 @@ class Posit92 {
     Object.freeze(this.#importObject);
     await this.#initWebAssembly();
     this.#initWasmMemory();
-
     this.#wasm.exports.init();
 
     this.#initKeyboard();
@@ -230,8 +319,6 @@ class Posit92 {
   async quickStart() {
     this.hideLoadingOverlay();
     this.#wasm.exports.beginLoadingState();
-    // await this.#loadAssets();
-    // this.afterInit()
   }
 
   afterInit() {
@@ -249,7 +336,7 @@ class Posit92 {
     this.#canvas.style.removeProperty("cursor")
   }
 
-  #assertNumber(value) {
+  #assertNumber(value: any) {
     if (typeof value != "number")
       throw new Error(`Expected a number, but received ${typeof value}`);
 
@@ -257,16 +344,13 @@ class Posit92 {
       throw new Error("Expected a number, but received NaN");
   }
 
-  #assertString(value) {
+  #assertString(value: any) {
     if (typeof value != "string")
       throw new Error(`Expected a string, but received ${typeof value}`);
   }
 
 
-  async loadImageFromURL(url) {
-    if (url == null)
-      throw new Error("loadImageFromURL: url is required");
-
+  async loadImageFromURL(url: string): Promise<HTMLImageElement> {
     this.#assertString(url);
 
     return new Promise((resolve, reject) => {
@@ -278,12 +362,9 @@ class Posit92 {
   }
 
   // Used in loadImage
-  #images = [];
+  #images: Array<ImageData | null> = [];
 
-  async loadImage(url) {
-    if (url == null)
-      throw new Error("loadImage: url is required");
-
+  async loadImage(url: string) {
     this.#assertString(url);
 
     const img = await this.loadImageFromURL(url);
@@ -292,7 +373,11 @@ class Posit92 {
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = img.width;
     tempCanvas.height = img.height;
+    
     const tempCtx = tempCanvas.getContext("2d");
+    if (tempCtx == null)
+      throw new Error("Error getting 2D canvas context");
+
     tempCtx.drawImage(img, 0, 0);
 
     const imageData = tempCtx.getImageData(0, 0, img.width, img.height);
@@ -325,7 +410,7 @@ class Posit92 {
   #loadingTotal = 0;
   getLoadingTotal() { return this.#loadingTotal }
 
-  async #loadSingleImage(key, path) {
+  async #loadSingleImage(key: string, path: string) {
     return this.loadImage(path).then(handle => {
       // On success
       this.incLoadingActual();
@@ -333,13 +418,7 @@ class Posit92 {
     })
   }
 
-  /**
-   * 
-   * @param {string} key 
-   * @param {Array<string>} paths 
-   * @returns 
-   */
-  async #loadImageArray(key, paths) {
+  async #loadImageArray(key: string, paths: Array<string>) {
     const promises = paths.map((path, index) => 
       this.loadImage(path).then(handle => {
         // On success
@@ -358,9 +437,9 @@ class Posit92 {
    * 
    * For example: `setImgCursor, setImgHandCursor`
    * 
-   * @param {Object.<string, string & string[]>} manifest - Key-value pairs of `"asset_key": "image_path"`
+   * @param manifest - Key-value pairs of `"asset_key": "image_path"`
    */
-  async loadImagesFromManifest(manifest) {
+  async loadImagesFromManifest(manifest: ImageManifest) {
     const entries = Object.entries(manifest);
 
     const promises = entries.map(([key, pathOrArray]) =>
@@ -371,7 +450,14 @@ class Posit92 {
 
     const results = await Promise.all(promises);
 
-    const failures = results.filter(item => item.handle == 0);
+    type FailureItem = {
+      key: string,
+      path: string,
+      handle: number,
+      index?: number
+    };
+    const failures = <Array<FailureItem>>results.flat(1).filter(item => item.handle == 0);
+
     if (failures.length > 0) {
       console.error("Failed to load assets:");
       
@@ -381,50 +467,42 @@ class Posit92 {
       throw new Error("Failed to load some assets")
     }
 
-    for (const item of results) {
-      if (Array.isArray(item)) {
-        for (const subitem of item) {
-          const { key, handle, index } = subitem;
-          
-          const caps = key
-            .replace(/^./, _ => _.toUpperCase())
-            .replace(/_(.)/g, (_, g1) => g1.toUpperCase());
-          const setterName = `setImg${caps}`;
+    for (const item of results.flat(1)) {
+      type ResultItem = { key: string, handle: number, index?: number };
+      const { key, handle, index } = <ResultItem>item;
+      
+      const caps = key
+        .replace(/^./, _ => _.toUpperCase())
+        .replace(/_(.)/g, (_, g1) => g1.toUpperCase());
+      const setterName = `setImg${caps}`;
 
-          if (typeof this.wasmInstance.exports[setterName] != "function")
-            console.error("loadAssetsFromManifest: Missing setter", setterName, "for the asset key", key)
-          else
-            this.wasmInstance.exports[setterName](handle, index);
-        }
-
-      } else {
-        const { key, handle } = item;
-        
-        const caps = key
-          .replace(/^./, _ => _.toUpperCase())
-          .replace(/_(.)/g, (_, g1) => g1.toUpperCase());
-        const setterName = `setImg${caps}`;
-
-        if (typeof this.wasmInstance.exports[setterName] != "function")
-          console.error("loadAssetsFromManifest: Missing setter", setterName, "for the asset key", key)
-        else
+      if (typeof this.wasmInstance.exports[setterName] != "function")
+        console.error("loadAssetsFromManifest: Missing setter", setterName, "for the asset key", key)
+      else {
+        if (index == null)
+          //@ts-ignore
           this.wasmInstance.exports[setterName](handle);
+        else
+          //@ts-ignore
+          this.wasmInstance.exports[setterName](handle, index);
       }
     }
   }
 
-  async loadBMFontFromManifest(manifest) {
+  async loadBMFontFromManifest(manifest: BMFontManifest) {
     const entries = Object.entries(manifest);
     // console.log(entries);
 
     const promises = entries.map(([key, params]) => {
       const setter = this.wasmInstance.exports[params.setter];
+
       if (typeof setter != "function") {
         console.error("loadBMFontFromManifest: Missing setter", setter);
         return { key, setterPtr: 0 }
       }
 
       const glyphSetter = this.wasmInstance.exports[params.glyphSetter];
+
       if (typeof glyphSetter != "function") {
         console.error("loadBMFontFromManifest: Missing glyphSetter", params.glyphSetter);
         return { key, glyphSetterPtr: 0 }
@@ -467,37 +545,52 @@ class Posit92 {
     this.#loadingActual++
   }
 
-  setLoadingActual(value) {
+  setLoadingActual(value: number) {
     this.#assertNumber(value);
     this.#loadingActual = value
   }
 
-  incLoadingTotal(count) {
+  incLoadingTotal(count: number) {
     this.#loadingTotal += count
   }
 
-  setLoadingTotal(value) {
+  setLoadingTotal(value: number) {
     this.#assertNumber(value);
     this.#loadingTotal = value
   }
 
-  setLoadingText(text) {
+  setLoadingText(text: string) {
     const div = document.querySelector("#loading-overlay > div");
+    if (div == null) return;
     div.innerHTML = text;
   }
 
   hideLoadingOverlay() {
     const div = document.getElementById("loading-overlay");
-    // div.style.display = "none";
+    if (div == null) return;
     div.classList.add("hidden");
     this.setLoadingText("");
   }
 
-  async sleep(ms) {
+  async sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms))
   }
 
+  /**
+   * Overridable from `game.js`
+   */
+  AssetManifest: {
+    images: ImageManifest | null,
+    sounds: SoundManifest | null,
+    bmfonts: BMFontManifest | null
+  } | null = null;
+
   initLoadingScreen() {
+    if (this.AssetManifest == null) {
+      console.warn("Missing AssetManifest in " + this.constructor.name);
+      return
+    }
+
     const imageCount = this.AssetManifest.images != null
       ? Object.keys(this.AssetManifest.images).length
       : 0;
@@ -514,7 +607,7 @@ class Posit92 {
 
 
   // BMFONT.PAS
-  #newBMFontGlyph() {
+  #newBMFontGlyph(): TBMFontGlyph {
     return {
       id: 0,
       x: 0,
@@ -528,10 +621,7 @@ class Posit92 {
     }
   }
 
-  async loadBMFont(url, fontPtrRef, fontGlyphsPtrRef) {
-    if (url == null)
-      throw new Error("loadBMFont: url is required");
-
+  async loadBMFont(url: string, fontPtrRef: number, fontGlyphsPtrRef: number) {
     this.#assertString(url);
     this.#assertNumber(fontPtrRef);
     this.#assertNumber(fontGlyphsPtrRef);
@@ -542,33 +632,29 @@ class Posit92 {
     const lines = text.endsWith("\r\n") ? text.split("\r\n") : text.split("\n");
 
     let txtLine = "";
-    /**
-     * @type {Array<[string, string]>}
-     */
-    let pairs;
+    let pairs: Array<StringPair>;
     let k = "", v = "";
 
     let lineHeight = 0;
-    // font bitmap URL
     let filename = "";
-    const fontGlyphs = {};
+    const fontGlyphs: Map<number, TBMFontGlyph> = new Map();
     let glyphCount = 0;
     let imgHandle = 0;
 
     for (const line of lines) {
       txtLine = line.replaceAll(/\s+/g, " ");
       
-      pairs = txtLine.split(" ").map(part => part.split("="));
+      pairs = txtLine.split(" ").map(part => <StringPair>part.split("="));
 
       if (txtLine.startsWith("info")) {
-        [k, v] = pairs.find(pair => pair[0] == "face");
+        [k, v] = <StringPair>(pairs.find(pair => pair[0] == "face"));
 
       } else if (txtLine.startsWith("common")) {
-        [k, v] = pairs.find(pair => pair[0] == "lineHeight");
+        [k, v] = <StringPair>(pairs.find(pair => pair[0] == "lineHeight"));
         lineHeight = parseInt(v);
 
       } else if (txtLine.startsWith("page")) {
-        [k, v] = pairs.find(pair => pair[0] == "file");
+        [k, v] = <StringPair>(pairs.find(pair => pair[0] == "file"));
         filename = v.replaceAll(/"/g, "");
 
       } else if (txtLine.startsWith("char") && !txtLine.startsWith("chars")) {
@@ -587,12 +673,12 @@ class Posit92 {
           }
         }
 
-        fontGlyphs[tempGlyph.id] = tempGlyph;
+        fontGlyphs.set(tempGlyph.id, tempGlyph);
         glyphCount++
       }
     }
 
-    console.log("Loaded", glyphCount, "glyphs");
+    // console.log("Loaded", glyphCount, "glyphs");
 
     // Load font bitmap
     imgHandle = await this.loadImage(filename);
@@ -612,22 +698,19 @@ class Posit92 {
 
     // true makes it little-endian
     fontMem.setUint16(offset, lineHeight, true);
-    
-    // +2 requires a packed record because Pascal records are padded by default
-    fontMem.setInt32(offset + 2, imgHandle, true);
+    fontMem.setInt32(offset + 4, imgHandle, true);
 
     // Write glyphs
     const glyphsMem = new DataView(this.#wasm.exports.memory.buffer, glyphsPtr);
 
-    for (const charID in fontGlyphs) {
-      const glyph = fontGlyphs[charID];
-      const id = parseInt(charID);
+    for (const charID of fontGlyphs.keys()) {
+      const glyph = fontGlyphs.get(charID)!;
 
       // Range check
-      if (id < 32 || id > 126) continue;
+      if (charID < 32 || charID > 126) continue;
 
       // 16 is from the 8 fields of TBMFontGlyph, all 2 bytes
-      const glyphOffset = (id - 32) * 16;
+      const glyphOffset = (charID - 32) * 16;
 
       glyphsMem.setUint16(glyphOffset + 0, glyph.id, true);
 
@@ -641,16 +724,22 @@ class Posit92 {
       glyphsMem.setInt16(glyphOffset + 14, glyph.xadvance, true);
     }
 
-    console.log("loadBMFont completed");
+    // console.log("loadBMFont completed");
   }
 
 
   // KEYBOARD.PAS
+  ScancodeMap: Record<string, number> = null!;
   heldScancodes = new Set();
 
   #initKeyboard() {
+    if (this.ScancodeMap == null) {
+      console.warn("Missing ScancodeMap in " + this.constructor.name);
+      return
+    }
+
     const ScancodeMap = this.ScancodeMap;
-    
+
     window.addEventListener("keydown", e => {
       if (e.repeat) return;
 
@@ -667,7 +756,7 @@ class Posit92 {
     })
   }
 
-  #isKeyDown(scancode) {
+  #isKeyDown(scancode: number) {
     return this.heldScancodes.has(scancode)
   }
 
@@ -739,10 +828,11 @@ class Posit92 {
 
 
   // PANIC.PAS
-  #panicHalt(textPtr, textLen) {
+  #panicHalt(textPtr: number, textLen: number) {
     const buffer = new Uint8Array(this.#wasm.exports.memory.buffer, textPtr, textLen);
     const msg = new TextDecoder().decode(buffer);
 
+    //@ts-ignore
     done = true;
     this.cleanup();
 
@@ -824,11 +914,6 @@ class Posit92 {
 
 
   // Game loop
-  update() {
-    this.#wasm.exports.update()
-  }
-
-  draw() {
-    this.#wasm.exports.draw()
-  }
+  update() { this.#wasm.exports.update() }
+  draw() { this.#wasm.exports.draw() }
 }
