@@ -1,7 +1,7 @@
 import { Byte, LongInt, pointer, Word } from "./pascal_compat";
 
-const LogBufferSize = 256;
-const logBuffer = memory.data<Byte>(LogBufferSize);
+const LogBufferSize: i32 = 256;
+const logBuffer = new StaticArray<Byte>(LogBufferSize);
 
 // @ts-ignore
 @external("env", "writeLogI32")
@@ -11,7 +11,7 @@ export declare function writeLogI32(value: LongInt): void;
 @external("env", "flushLog")
 declare function flushLog(): void;
 
-export function writeLog(msg: string) {
+export function writeLog(msg: string): void {
   let a: Byte;
   let len = <Word>msg.length;
 
@@ -19,14 +19,14 @@ export function writeLog(msg: string) {
   if (len > 255) len = 255;
 
   // logBuffer[0] is implicit here
-  store<Byte>(logBuffer, <Byte>len);
+  logBuffer[0] = <Byte>len;
   for (a = 0; a <= len; a++)
-    store<Byte>(logBuffer + 1 + a, msg.charCodeAt(a));
+    logBuffer[1 + a] = <Byte>msg.charCodeAt(a);
 
   // JS will read logBuffer
   flushLog()
 }
 
 export function getLogBufferPtr(): pointer {
-  return logBuffer
+  return changetype<pointer>(logBuffer)
 }
