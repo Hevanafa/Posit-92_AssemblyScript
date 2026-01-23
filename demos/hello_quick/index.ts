@@ -1,14 +1,15 @@
+import { Byte, double, LongInt, SmallInt, Word } from "../../experimental/units/pascal_compat";
+
+import { i32str } from "../../experimental/units/conv";
 import { cls, vgaFlush, vgaWidth } from "../../experimental/units/vga";
-import { Byte, double, LongInt, SmallInt } from "../../experimental/units/pascal_compat";
 import { fitCanvas } from "../../experimental/units/fullscreen";
 import { isKeyDown } from "../../experimental/units/keyboard";
 import { getMouseX, getMouseY, updateMouse } from "../../experimental/units/mouse";
-import { incrementFPS, initFPSCounter } from "../../experimental/units/fps";
+import { getLastFPS, incrementFPS, initFPSCounter } from "../../experimental/units/fps";
 import { dt, initDeltaTime, updateDeltaTime } from "../../experimental/units/timing";
-import { spr } from "../../experimental/units/img_ref_fast";
+import { spr, sprRegion } from "../../experimental/units/img_ref_fast";
 
-import { imgCursor, imgDosuEXE } from "./assets";
-import { writeLog } from "../../experimental/units/logger";
+import { imgCGA, imgCursor, imgDosuEXE } from "./assets";
 
 enum TGameStates {
   GameStateIntro = 1,
@@ -40,9 +41,9 @@ export declare function hideLoadingOverlay(): void;
 export declare function loadAssets(): void;
 
 
-// function drawFPS(): void {
-//   printDefault('FPS:' + i32str(getLastFPS), 240, 0);
-// }
+function drawFPS(): void {
+  printSimple("FPS:" + i32str(getLastFPS()), 240, 0);
+}
 
 function drawMouse(): void {
   spr(imgCursor, getMouseX(), getMouseY())
@@ -60,9 +61,28 @@ function beginPlayingState(): void {
   fitCanvas();
 
   // Initialise game state here
-  writeLog("beginPlayingState");
   actualGameState = TGameStates.GameStatePlaying;
   gameTime = 0.0;
+}
+
+
+function printSimple(text: string, x: SmallInt, y: SmallInt): void {
+  let a: Word;
+  let charcode: Byte;
+  let left: SmallInt = 0;
+  let row: SmallInt, col: SmallInt;
+
+  for (a = 0; a < <u16>text.length; a++) {
+    charcode = <Byte>text.charCodeAt(a);
+    row = charcode / 16;
+    col = charcode % 16;
+
+    sprRegion(imgCGA,
+      col * 8, row * 8, 8, 8,
+      x + left, y);
+
+    left += 8
+  }
 }
 
 
@@ -97,9 +117,6 @@ function update(): void {
 }
 
 function draw(): void {
-  let w: SmallInt;
-  let s: string;
-
   // if (actualGameState == TGameStates.GameStateLoading) {
   //   renderLoadingScreen();
   //   return
@@ -112,12 +129,10 @@ function draw(): void {
   else
     spr(imgDosuEXE[0], 148, 88);
 
-  // s = 'Hello world!';
-  // w = measureDefault(s);
-  // printDefault(s, (vgaWidth - w) / 2, 120);
+  printSimple("Hello world!", (vgaWidth - 96) / 2, 120);
 
   drawMouse();
-  // drawFPS();
+  drawFPS();
 
   vgaFlush()
 }
@@ -125,7 +140,7 @@ function draw(): void {
 // Everything exported here will be available
 // via WebAssembly instance exports
 
-export { setImgCursor, setImgDosuEXE } from "./assets";
+export { setImgCursor, setImgDosuEXE, setImgCga } from "./assets";
 
 export { initVideoMem, getSurfacePtr } from "../../experimental/units/vga";
 export { initHeap, WasmGetMem } from "../../experimental/units/wasm_heap";

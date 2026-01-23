@@ -11,7 +11,8 @@ class Game extends Posit92 {
 
   AssetManifest = {
     images: {
-      cursor: "assets/images/cursor.png"
+      cursor: "assets/images/cursor.png",
+      cga: "assets/images/CGA8x8.png"
       // Add more image assets here
     },
     sounds: new Map([
@@ -45,7 +46,7 @@ class Game extends Posit92 {
 }
 
 const TargetFPS = 60;
-const FrameTime = 1000 / 60.0;
+const FrameTime = 1000 / TargetFPS;
 /**
  * in milliseconds
  */
