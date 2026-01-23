@@ -10,6 +10,7 @@ import { dt, initDeltaTime, updateDeltaTime } from "../../experimental/units/tim
 import { spr, sprRegion } from "../../experimental/units/img_ref_fast";
 
 import { imgCGA, imgCursor, imgDosuEXE } from "./assets";
+import { printBMFontChar } from "../../experimental/units/bmfont";
 
 enum TGameStates {
   GameStateIntro = 1,
@@ -42,7 +43,7 @@ export declare function loadAssets(): void;
 
 
 function drawFPS(): void {
-  printSimple("FPS:" + i32str(getLastFPS()), 240, 0);
+  printDefault("FPS:" + i32str(getLastFPS()), 240, 0);
 }
 
 function drawMouse(): void {
@@ -63,26 +64,6 @@ function beginPlayingState(): void {
   // Initialise game state here
   actualGameState = TGameStates.GameStatePlaying;
   gameTime = 0.0;
-}
-
-
-function printSimple(text: string, x: SmallInt, y: SmallInt): void {
-  let a: Word;
-  let charcode: Byte;
-  let left: SmallInt = 0;
-  let row: SmallInt, col: SmallInt;
-
-  for (a = 0; a < <u16>text.length; a++) {
-    charcode = <Byte>text.charCodeAt(a);
-    row = charcode / 16;
-    col = charcode % 16;
-
-    sprRegion(imgCGA,
-      col * 8, row * 8, 8, 8,
-      x + left, y);
-
-    left += 8
-  }
 }
 
 
@@ -129,7 +110,7 @@ function draw(): void {
   else
     spr(imgDosuEXE[0], 148, 88);
 
-  printSimple("Hello world!", (vgaWidth - 96) / 2, 120);
+  printBMFontChar("H", (vgaWidth - 96) / 2, 120);
 
   drawMouse();
   drawFPS();

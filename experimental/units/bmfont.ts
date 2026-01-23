@@ -1,3 +1,4 @@
+import { sprRegion } from "./img_ref_fast";
 import { Byte, LongInt, SmallInt, Word } from "./pascal_compat";
 
 export class TBMFontGlyph {
@@ -34,4 +35,34 @@ export class TBMFont {
     this.lineHeight = 0;
     this.imgHandle = 0;
   }
+}
+
+// Returns glyph.xadvance
+export function printBMFontChar(
+  font: TBMFont,
+  fontGlyphs: StaticArray<TBMFontGlyph>,
+  charcode: Byte,
+  x: SmallInt, y: SmallInt): SmallInt
+{
+  let glyphIdx: integer;
+  let glyph: TBMFontGlyph;
+
+  // Assuming the starting charcode is always 32
+  // glyphIdx := charcode - 32;
+
+  glyphIdx = charcode;
+
+  // if (glyphIdx in [low(fontGlyphs)..high(fontGlyphs)]) {
+  if (glyphIdx < fontGlyphs.length) {
+    glyph = fontGlyphs[glyphIdx];
+
+    sprRegion(
+      font.imgHandle,
+      glyph.x, glyph.y,
+      glyph.width, glyph.height,
+      x + glyph.xoffset, y + glyph.yoffset);
+    
+    return glyph.xadvance
+  } else
+    return 0;
 }

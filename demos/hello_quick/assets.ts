@@ -1,4 +1,4 @@
-import { LongInt, pointer, SmallInt } from "../../experimental/units/pascal_compat";
+import { LongInt, pointer, SmallInt, Word } from "../../experimental/units/pascal_compat";
 import { TBMFont, TBMFontGlyph } from "../../experimental/units/bmfont";
 
 export let
@@ -28,3 +28,11 @@ export function defaultFontPtr(): pointer {
 export function defaultFontGlyphsPtr(): pointer {
   return changetype<pointer>(defaultFontGlyphs)
 }
+
+function printDefault(text: string, x: SmallInt, y: SmallInt) {
+  // TODO
+}
+
+// TODO: function measureDefault(text: string): Word {
+
+// }
