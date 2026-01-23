@@ -122,7 +122,7 @@ function draw(): void {
 // via WebAssembly instance exports
 
 export { initVideoMem, getSurfacePtr } from "../../experimental/units/vga";
-export { initHeap } from "../../experimental/units/wasm_heap";
+export { initHeap, WasmGetMem } from "../../experimental/units/wasm_heap";
 
 export {
   beginLoadingState,

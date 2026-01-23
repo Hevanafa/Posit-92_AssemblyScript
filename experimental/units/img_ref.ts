@@ -50,7 +50,11 @@ export function registerImageRef(imgHandle: LongInt, dataPtr: PByte, w: SmallInt
   imageRefs[imgHandle].dataPtr = dataPtr;
 }
 
-function isImageSet(imgHandle: LongInt): bool {
+export function getImagePtr(imgHandle: LongInt): PImageRef {
+  return imageRefs[imgHandle]
+}
+
+export function isImageSet(imgHandle: LongInt): bool {
   if (imgHandle <= 0) return false;
 
   return imageRefs[imgHandle].allocSize > 0
