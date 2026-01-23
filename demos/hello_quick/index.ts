@@ -2,9 +2,10 @@ import { cls, vgaFlush, vgaWidth } from "../../experimental/units/vga";
 import { Byte, double, LongInt, SmallInt } from "../../experimental/units/pascal_compat";
 import { fitCanvas } from "../../experimental/units/fullscreen";
 import { isKeyDown } from "../../experimental/units/keyboard";
-import { updateMouse } from "../../experimental/units/mouse";
+import { getMouseX, getMouseY, updateMouse } from "../../experimental/units/mouse";
 import { incrementFPS, initFPSCounter } from "../../experimental/units/fps";
 import { dt, initDeltaTime, updateDeltaTime } from "../../experimental/units/timing";
+import { imgCursor } from "./assets";
 
 enum TGameStates {
   GameStateIntro = 1,
@@ -34,6 +35,16 @@ export declare function hideLoadingOverlay(): void;
 // @ts-ignore
 @external("env", "loadAssets")
 export declare function loadAssets(): void;
+
+
+// function drawFPS(): void {
+//   printDefault('FPS:' + i32str(getLastFPS), 240, 0);
+// }
+
+function drawMouse(): void {
+  spr(imgCursor, getMouseX(), getMouseY())
+}
+
 
 function beginLoadingState(): void {
   actualGameState = TGameStates.GameStateLoading;
@@ -85,29 +96,31 @@ function draw(): void {
   let w: SmallInt;
   let s: string;
 
-  if (actualGameState == TGameStates.GameStateLoading) {
-    renderLoadingScreen();
-    return
-  }
+  // if (actualGameState == TGameStates.GameStateLoading) {
+  //   renderLoadingScreen();
+  //   return
+  // }
 
   cls(CornflowerBlue);
 
-  if ((<LongInt>(gameTime * 4) & 1) > 0)
-    spr(imgDosuEXE[1], 148, 88)
-  else
-    spr(imgDosuEXE[0], 148, 88);
+  // if ((<LongInt>(gameTime * 4) & 1) > 0)
+  //   spr(imgDosuEXE[1], 148, 88)
+  // else
+  //   spr(imgDosuEXE[0], 148, 88);
 
-  s = 'Hello world!';
-  w = measureDefault(s);
-  printDefault(s, (vgaWidth - w) / 2, 120);
+  // s = 'Hello world!';
+  // w = measureDefault(s);
+  // printDefault(s, (vgaWidth - w) / 2, 120);
 
   drawMouse();
-  drawFPS();
+  // drawFPS();
 
   vgaFlush()
 }
 
-// Everything exported here will be available via WebAssembly instance exports
+// Everything exported here will be available
+// via WebAssembly instance exports
+
 export { initVideoMem, getSurfacePtr } from "../../experimental/units/vga";
 export { initHeap } from "../../experimental/units/wasm_heap";
 
