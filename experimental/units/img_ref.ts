@@ -50,6 +50,7 @@ export function registerImageRef(imgHandle: LongInt, dataPtr: PByte, w: SmallInt
   imageRefs[imgHandle].allocSize = <LongWord>w * h * 4;
   imageRefs[imgHandle].dataPtr = dataPtr;
 
+  // @ts-ignore
   __pin(imageRefs[imgHandle].dataPtr)
 }
 
@@ -60,7 +61,8 @@ export function freeImage(imgHandle: LongInt): void {
   imageRefs[imgHandle].width = 0;
   imageRefs[imgHandle].height = 0;
   imageRefs[imgHandle].allocSize = 0;
-  
+
+  // @ts-ignore
   __unpin(imageRefs[imgHandle].dataPtr);
   imageRefs[imgHandle].dataPtr = 0;
 }
