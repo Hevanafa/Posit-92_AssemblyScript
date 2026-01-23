@@ -31,7 +31,7 @@ export function spr(imgHandle: LongInt, x: SmallInt, y: SmallInt) {
     // offset to ImageData buffer
     offset = (px + py * image.width) * 4;
 
-    a = image.dataPtr[offset + 3];
+    a = load<Byte>(image.dataPtr + offset + 3);
     if (a < 255) continue;
 
     colour = unsafeSprPget(image, px, py);
