@@ -7,13 +7,13 @@ export class TImageRef {
   width: SmallInt;
   height: SmallInt;
   allocSize: LongWord;
-  dataPtr: PByte;
+  dataPtr: PByte | null;
 
   constructor(width: SmallInt = 0, height: SmallInt = 0) {
     this.width = width;
     this.height = height;
     this.allocSize = 0;
-    this.dataPtr = 0;
+    this.dataPtr = null;
   }
 }
 
@@ -49,6 +49,18 @@ export function registerImageRef(imgHandle: LongInt, dataPtr: PByte, w: SmallInt
   imageRefs[imgHandle].height = h;
   imageRefs[imgHandle].allocSize = <LongWord>w * h * 4;
   imageRefs[imgHandle].dataPtr = dataPtr;
+
+  __pin(imageRefs[imgHandle].dataPtr)
+}
+
+export function freeImage(imgHandle: LongInt) {
+  if ((imgHandle < 1) || (imgHandle >= MaxImageRefs)) return;
+  if (imageRefs[imgHandle].dataPtr == null) return;
+
+  imageRefs[imgHandle].width = 0;
+  imageRefs[imgHandle].height = 0;
+  imageRefs[imgHandle].allocSize = 0;
+  imageRefs[imgHandle].dataPtr = null
 }
 
 export function getImagePtr(imgHandle: LongInt): TImageRef {
