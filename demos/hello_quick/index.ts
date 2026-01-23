@@ -8,6 +8,7 @@ import { dt, initDeltaTime, updateDeltaTime } from "../../experimental/units/tim
 import { spr } from "../../experimental/units/img_ref_fast";
 
 import { imgCursor, imgDosuEXE } from "./assets";
+import { writeLog } from "../../experimental/units/logger";
 
 enum TGameStates {
   GameStateIntro = 1,
@@ -59,6 +60,7 @@ function beginPlayingState(): void {
   fitCanvas();
 
   // Initialise game state here
+  writeLog("beginPlayingState");
   actualGameState = TGameStates.GameStatePlaying;
   gameTime = 0.0;
 }
@@ -127,6 +129,7 @@ export { setImgCursor, setImgDosuEXE } from "./assets";
 
 export { initVideoMem, getSurfacePtr } from "../../experimental/units/vga";
 export { initHeap, WasmGetMem } from "../../experimental/units/wasm_heap";
+export { getLogBufferPtr } from "../../experimental/units/logger";
 export { registerImageRef } from "../../experimental/units/img_ref";
 
 export {
