@@ -43,7 +43,7 @@ export function sprRegion(
   let
     image: PImageRef,
     a: SmallInt, b: SmallInt,
-    sx, sy: SmallInt,
+    sx: SmallInt, sy: SmallInt,
     srcPos: LongInt,
     alpha: Byte,
     colour: LongWord;

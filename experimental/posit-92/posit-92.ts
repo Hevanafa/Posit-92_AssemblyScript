@@ -35,6 +35,9 @@ type WasmImports = {
   env: {
     _haltproc: (n: number) => void,
 
+    // AssemblyScript
+    abort: (message: number, filename: number, line: number, column: number) => void,
+
     hideLoadingOverlay: () => void,
     loadAssets: () => void,
 
@@ -120,6 +123,11 @@ class Posit92 {
   #importObject: WasmImports = {
     env: {
       _haltproc: this.#handleHaltProc.bind(this),
+
+      // AssemblyScript
+      abort: (message: number, filename: number, line: number, column: number) => {
+        throw new Error("env.abort: Function not implemented.");
+      },
 
       // Intro
       hideLoadingOverlay: this.hideLoadingOverlay.bind(this),
