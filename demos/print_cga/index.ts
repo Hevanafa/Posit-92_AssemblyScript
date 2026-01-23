@@ -66,31 +66,18 @@ function beginPlayingState(): void {
 }
 
 
-let once = false;
 function printSimple(text: string, x: SmallInt, y: SmallInt): void {
   let a: Word;
   let charcode: Byte;
   let left: SmallInt = 0;
   let row: SmallInt, col: SmallInt;
 
-  if (!once) {
-    writeLog("Charcodes");
-    once = true;
-
-    for (a = 0; a < <u16>text.length; a++) {
-      charcode = <Byte>text.charCodeAt(a);
-      writeLogI32(charcode / 16);
-      writeLogI32(charcode % 16);
-    }
-  }
-
   for (a = 0; a < <u16>text.length; a++) {
     charcode = <Byte>text.charCodeAt(a);
     row = charcode / 16;
     col = charcode % 16;
 
-    sprRegion(
-      imgCGA,
+    sprRegion(imgCGA,
       col * 8, row * 8, 8, 8,
       x + left, y);
 
@@ -130,9 +117,6 @@ function update(): void {
 }
 
 function draw(): void {
-  let w: SmallInt;
-  let s: string;
-
   // if (actualGameState == TGameStates.GameStateLoading) {
   //   renderLoadingScreen();
   //   return
@@ -140,21 +124,12 @@ function draw(): void {
 
   cls(CornflowerBlue);
 
-  // spr(imgCGA, 10, 10);
-  sprRegion(imgCGA, 64, 32, 8, 8, 10, 20);
-  sprRegion(imgCGA, 8 * 8, 4 * 8, 8, 8, 10, 30);
-  printSimple("Help!", 10, 10);
+  if ((<LongInt>(gameTime * 4) & 1) > 0)
+    spr(imgDosuEXE[1], 148, 88)
+  else
+    spr(imgDosuEXE[0], 148, 88);
 
-  // if ((<LongInt>(gameTime * 4) & 1) > 0)
-  //   spr(imgDosuEXE[1], 148, 88)
-  // else
-  //   spr(imgDosuEXE[0], 148, 88);
-
-  // printSimple("Hello world!", 10, 10);
-
-  // s = 'Hello world!';
-  // w = measureDefault(s);
-  // printDefault(s, (vgaWidth - w) / 2, 120);
+  printSimple("Hello world!", (vgaWidth - 96) / 2, 120);
 
   drawMouse();
   // drawFPS();
