@@ -1,7 +1,9 @@
-import { writeLogI32 } from "./logger";
 import { Byte, LongInt, LongWord, PByte, SmallInt } from "./pascal_compat";
 
-class TImageRef {
+/**
+ * TImageRef is already a reference type
+ */
+export class TImageRef {
   width: SmallInt;
   height: SmallInt;
   allocSize: LongWord;
@@ -14,9 +16,6 @@ class TImageRef {
     this.dataPtr = 0;
   }
 }
-
-// TImageRef is already a reference type
-export type PImageRef = TImageRef;
 
 export enum SprFlips {
   SprFlipNone = 0,
@@ -52,18 +51,18 @@ export function registerImageRef(imgHandle: LongInt, dataPtr: PByte, w: SmallInt
   imageRefs[imgHandle].dataPtr = dataPtr;
 }
 
-export function getImagePtr(imgHandle: LongInt): PImageRef {
+export function getImagePtr(imgHandle: LongInt): TImageRef {
   return imageRefs[imgHandle]
 }
 
-export function isImageSet(imgHandle: LongInt): bool {
+export function isImageSet(imgHandle: LongInt): boolean {
   if (imgHandle <= 0) return false;
 
   return imageRefs[imgHandle].allocSize > 0
 }
 
 // Assuming image isn't nil & the bounds are known
-export function unsafeSprPget(image: PImageRef, x: SmallInt, y: SmallInt): LongWord {
+export function unsafeSprPget(image: TImageRef, x: SmallInt, y: SmallInt): LongWord {
   let offset: LongWord;
   offset = (x + y * image.width) * 4;
 

@@ -1,10 +1,10 @@
-import { PImageRef, getImagePtr, isImageSet, unsafeSprPget } from "./img_ref";
+import { TImageRef, getImagePtr, isImageSet, unsafeSprPget } from "./img_ref";
 import { Byte, LongInt, LongWord, SmallInt } from "./pascal_compat";
 import { unsafePset, vgaHeight, vgaWidth } from "./vga";
 
 export function spr(imgHandle: LongInt, x: SmallInt, y: SmallInt): void {
   let
-    image: PImageRef,
+    image: TImageRef,
     px: SmallInt,
     py: SmallInt,
     offset: LongWord,
@@ -41,7 +41,7 @@ export function sprRegion(
   destX: SmallInt, destY: SmallInt): void
 {
   let
-    image: PImageRef,
+    image: TImageRef,
     a: SmallInt, b: SmallInt,
     sx: SmallInt, sy: SmallInt,
     srcPos: LongInt,
