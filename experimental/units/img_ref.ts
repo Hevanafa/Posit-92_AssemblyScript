@@ -50,9 +50,6 @@ export function registerImageRef(imgHandle: LongInt, dataPtr: PByte, w: SmallInt
   imageRefs[imgHandle].height = h;
   imageRefs[imgHandle].allocSize = <LongWord>w * h * 4;
   imageRefs[imgHandle].dataPtr = dataPtr;
-
-  for (let a: SmallInt = 0; a < 20; a++)
-    writeLogI32(load<Byte>(imageRefs[imgHandle].dataPtr + a));
 }
 
 export function getImagePtr(imgHandle: LongInt): PImageRef {
@@ -71,9 +68,9 @@ export function unsafeSprPget(image: PImageRef, x: SmallInt, y: SmallInt): LongW
   offset = (x + y * image.width) * 4;
 
   return (load<Byte>(image.dataPtr + offset + 3) << 24)
-    || (load<Byte>(image.dataPtr + offset) << 16)
-    || (load<Byte>(image.dataPtr + offset + 1) << 8)
-    || (load<Byte>(image.dataPtr + offset + 2))
+    | (load<Byte>(image.dataPtr + offset) << 16)
+    | (load<Byte>(image.dataPtr + offset + 1) << 8)
+    | (load<Byte>(image.dataPtr + offset + 2))
 }
 
 
