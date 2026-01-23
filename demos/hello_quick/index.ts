@@ -9,8 +9,8 @@ import { getLastFPS, incrementFPS, initFPSCounter } from "../../experimental/uni
 import { dt, initDeltaTime, updateDeltaTime } from "../../experimental/units/timing";
 import { spr, sprRegion } from "../../experimental/units/img_ref_fast";
 
-import { imgCGA, imgCursor, imgDosuEXE } from "./assets";
-import { printBMFontChar } from "../../experimental/units/bmfont";
+import { imgCGA, imgCursor, imgDosuEXE, measureDefault, printDefault } from "./assets";
+import { measureBMFont, printBMFontChar } from "../../experimental/units/bmfont";
 
 enum TGameStates {
   GameStateIntro = 1,
@@ -98,6 +98,9 @@ function update(): void {
 }
 
 function draw(): void {
+  let w: Word;
+  let s: string;
+
   // if (actualGameState == TGameStates.GameStateLoading) {
   //   renderLoadingScreen();
   //   return
@@ -110,7 +113,9 @@ function draw(): void {
   else
     spr(imgDosuEXE[0], 148, 88);
 
-  printBMFontChar("H", (vgaWidth - 96) / 2, 120);
+  s = "Hello world!";
+  w = measureDefault(s);
+  printDefault(s, (vgaWidth - 96) / 2, 120);
 
   drawMouse();
   drawFPS();

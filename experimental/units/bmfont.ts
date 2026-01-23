@@ -37,14 +37,16 @@ export class TBMFont {
   }
 }
 
-// Returns glyph.xadvance
+/**
+ * @returns `glyph.xadvance`
+ */
 export function printBMFontChar(
   font: TBMFont,
   fontGlyphs: StaticArray<TBMFontGlyph>,
   charcode: Byte,
   x: SmallInt, y: SmallInt): SmallInt
 {
-  let glyphIdx: integer;
+  let glyphIdx: SmallInt;
   let glyph: TBMFontGlyph;
 
   // Assuming the starting charcode is always 32
@@ -65,4 +67,47 @@ export function printBMFontChar(
     return glyph.xadvance
   } else
     return 0;
+}
+
+export function printBMFont(
+  font: TBMFont,
+  fontGlyphs: StaticArray<TBMFontGlyph>,
+  text: string,
+  x: SmallInt, y: SmallInt): void
+{
+  let a: Word;
+  let ch: Byte;
+  let left: SmallInt = 0;
+
+  for (a = 0; a < text.length; a++) {
+    ch = <Byte>text[a].charCodeAt(0);
+    left +=  printBMFontChar(font, fontGlyphs, ch, x + left, y)
+  }
+}
+
+export function measureBMFont(glyphs: StaticArray<TBMFontGlyph>, text: string): SmallInt
+{
+  let
+    a: Word, result: Word,
+    glyphIdx: SmallInt,
+    charcode: Byte;
+
+  result = 0;
+
+  // for a=1 to length(text) do begin
+  for (a=0; a < text.length; a++) {
+    charcode = <Byte>text[a].charCodeAt(0);
+
+    // { Assuming the starting charcode is always 32 }
+    // glyphIdx = charcode - 32;
+    glyphIdx = charcode;
+
+    // if (glyphIdx in [low(glyphs)..high(glyphs)]) then
+      // inc(result, glyphs[glyphIdx].xadvance)
+
+    if (glyphIdx < glyphs.length)
+      result += glyphs[glyphIdx].xadvance;
+  }
+
+  return result
 }

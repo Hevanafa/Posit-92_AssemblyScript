@@ -1,5 +1,5 @@
 import { LongInt, pointer, SmallInt, Word } from "../../experimental/units/pascal_compat";
-import { TBMFont, TBMFontGlyph } from "../../experimental/units/bmfont";
+import { measureBMFont, printBMFont, printBMFontChar, TBMFont, TBMFontGlyph } from "../../experimental/units/bmfont";
 
 export let
   imgCursor: LongInt,
@@ -29,10 +29,10 @@ export function defaultFontGlyphsPtr(): pointer {
   return changetype<pointer>(defaultFontGlyphs)
 }
 
-function printDefault(text: string, x: SmallInt, y: SmallInt) {
-  // TODO
+export function printDefault(text: string, x: SmallInt, y: SmallInt) {
+  printBMFont(defaultFont, defaultFontGlyphs, text, x, y)
 }
 
-// TODO: function measureDefault(text: string): Word {
-
-// }
+export function measureDefault(text: string): Word {
+  return measureBMFont(defaultFontGlyphs, text)
+}
