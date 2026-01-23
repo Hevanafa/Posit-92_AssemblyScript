@@ -1,6 +1,6 @@
 import { Byte, LongInt, SmallInt, Word } from "./pascal_compat";
 
-class TBMFontGlyph {
+export class TBMFontGlyph {
   id: Word;
   x: Word;
   y: Word;
@@ -22,7 +22,7 @@ class TBMFontGlyph {
   }
 }
 
-class TBMFont {
+export class TBMFont {
   face: StaticArray<Byte>;
   filename: StaticArray<Byte>;
   lineHeight: Word;

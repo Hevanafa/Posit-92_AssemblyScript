@@ -140,7 +140,10 @@ function draw(): void {
 // Everything exported here will be available
 // via WebAssembly instance exports
 
-export { setImgCursor, setImgDosuEXE, setImgCga } from "./assets";
+export {
+  setImgCursor, setImgDosuEXE, setImgCga,
+  defaultFontPtr, defaultFontGlyphsPtr
+} from "./assets";
 
 export { initVideoMem, getSurfacePtr } from "../../experimental/units/vga";
 export { initHeap, WasmGetMem } from "../../experimental/units/wasm_heap";
