@@ -7,13 +7,13 @@ export class TImageRef {
   width: SmallInt;
   height: SmallInt;
   allocSize: LongWord;
-  dataPtr: PByte | null;
+  dataPtr: PByte;
 
   constructor(width: SmallInt = 0, height: SmallInt = 0) {
     this.width = width;
     this.height = height;
     this.allocSize = 0;
-    this.dataPtr = null;
+    this.dataPtr = 0;
   }
 }
 
@@ -53,14 +53,14 @@ export function registerImageRef(imgHandle: LongInt, dataPtr: PByte, w: SmallInt
   __pin(imageRefs[imgHandle].dataPtr)
 }
 
-export function freeImage(imgHandle: LongInt) {
+export function freeImage(imgHandle: LongInt): void {
   if ((imgHandle < 1) || (imgHandle >= MaxImageRefs)) return;
-  if (imageRefs[imgHandle].dataPtr == null) return;
+  if (imageRefs[imgHandle].dataPtr == 0) return;
 
   imageRefs[imgHandle].width = 0;
   imageRefs[imgHandle].height = 0;
   imageRefs[imgHandle].allocSize = 0;
-  imageRefs[imgHandle].dataPtr = null
+  imageRefs[imgHandle].dataPtr = 0;
 }
 
 export function getImagePtr(imgHandle: LongInt): TImageRef {
@@ -70,17 +70,17 @@ export function getImagePtr(imgHandle: LongInt): TImageRef {
 export function isImageSet(imgHandle: LongInt): boolean {
   if (imgHandle <= 0) return false;
 
-  return (imageRefs[imgHandle].dataPtr != null) && (imageRefs[imgHandle].allocSize > 0)
+  return (imageRefs[imgHandle].dataPtr != 0) && (imageRefs[imgHandle].allocSize > 0)
 }
 
 // Assuming image isn't nil & the bounds are known
 export function unsafeSprPget(image: TImageRef, x: SmallInt, y: SmallInt): LongWord {
   const offset = (<LongWord>x + y * image.width) * 4;
 
-  return (load<Byte>(image.dataPtr! + offset + 3) << 24)
-    | (load<Byte>(image.dataPtr! + offset) << 16)
-    | (load<Byte>(image.dataPtr! + offset + 1) << 8)
-    | (load<Byte>(image.dataPtr! + offset + 2))
+  return (load<Byte>(image.dataPtr + offset + 3) << 24)
+    | (load<Byte>(image.dataPtr + offset) << 16)
+    | (load<Byte>(image.dataPtr + offset + 1) << 8)
+    | (load<Byte>(image.dataPtr + offset + 2))
 }
 
 
