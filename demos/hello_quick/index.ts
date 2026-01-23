@@ -7,7 +7,7 @@ import { incrementFPS, initFPSCounter } from "../../experimental/units/fps";
 import { dt, initDeltaTime, updateDeltaTime } from "../../experimental/units/timing";
 import { spr } from "../../experimental/units/img_ref_fast";
 
-import { imgCursor } from "./assets";
+import { imgCursor, imgDosuEXE } from "./assets";
 
 enum TGameStates {
   GameStateIntro = 1,
@@ -105,10 +105,10 @@ function draw(): void {
 
   cls(CornflowerBlue);
 
-  // if ((<LongInt>(gameTime * 4) & 1) > 0)
-  //   spr(imgDosuEXE[1], 148, 88)
-  // else
-  //   spr(imgDosuEXE[0], 148, 88);
+  if ((<LongInt>(gameTime * 4) & 1) > 0)
+    spr(imgDosuEXE[1], 148, 88)
+  else
+    spr(imgDosuEXE[0], 148, 88);
 
   // s = 'Hello world!';
   // w = measureDefault(s);
@@ -122,6 +122,8 @@ function draw(): void {
 
 // Everything exported here will be available
 // via WebAssembly instance exports
+
+export { setImgCursor, setImgDosuEXE } from "./assets";
 
 export { initVideoMem, getSurfacePtr } from "../../experimental/units/vga";
 export { initHeap, WasmGetMem } from "../../experimental/units/wasm_heap";
