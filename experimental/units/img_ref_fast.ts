@@ -34,3 +34,37 @@ export function spr(imgHandle: LongInt, x: SmallInt, y: SmallInt): void {
     unsafePset(x + px, y + py, colour)
   }
 }
+
+export function sprRegion(
+  imgHandle: LongInt,
+  srcX: SmallInt, srcY: SmallInt, srcW: SmallInt, srcH: SmallInt,
+  destX: SmallInt, destY: SmallInt): void
+{
+  let
+    image: PImageRef,
+    a: SmallInt, b: SmallInt,
+    sx, sy: SmallInt,
+    srcPos: LongInt,
+    alpha: Byte,
+    colour: LongWord;
+
+  if (!isImageSet(imgHandle)) return;
+
+  image = getImagePtr(imgHandle);
+
+  for (b=0; b < srcH; b++)
+  for (a=0; a < srcW; a++) {
+    if (((destX + a >= vgaWidth) || (destX + a < 0)
+      || (destY + b >= vgaHeight) || (destY + b < 0))) continue;
+
+    sx = srcX + a;
+    sy = srcY + b;
+    srcPos = (sx + sy * image.width) * 4;
+
+    alpha = load<Byte>(image.dataPtr, srcPos + 3);
+    if (alpha < 255) continue;
+
+    colour = unsafeSprPget(image, sx, sy);
+    unsafePset(destX + a, destY + b, colour);
+  }
+}
